@@ -36,9 +36,9 @@ __Integraciones__:
 
 ## ✅ Pruebas
 **Ejemplo de una conversación sobre los trámites disponibles**
-```markdown
+```
     User: Cuanto cuesta tramitar el CURP?
-    Assistant: El trámite para obtener la Clave Única de Registro de Población (CURP) es gratuito. No se requiere ningún documento, pero es importante tener a la mano los datos de tu documento probatorio de identidad. 
+    Assistant: El trámite para obtener la Clave Única de Registro de Población (CURP) es gratuito. No se requiere ningún documento, pero es importante tener a la mano los datos de tu documento probatorio de 	identidad. 
 
     Para más información, puedes consultar la página oficial [aquí](https://www.gob.mx/tramites/ficha/consulta-e-impresion-de-la-curp/SEGOB175).
 
