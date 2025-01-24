@@ -57,10 +57,13 @@ class MainAgent():
         full_text = ""
         for i in response:
             sleep(0.015)
-            text = i.message.content.replace(text_prev, "")
-            text_prev = i.message.content
-            full_text += text
+            text = i.message.content
+            if text is not None:
+                text.replace(text_prev, "")
+                text_prev = i.message.content
+                full_text += text
 
-            yield text
+                yield text
+            
         
         self.history.append((query, full_text))
