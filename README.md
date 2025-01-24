@@ -19,8 +19,7 @@ Implementación de un 🧠RAG para responder preguntas sobre Trámites Mexicanos
 	 ```python 
 	 OPENAI_API_KEY = "your_api_key"
 2. La primera vez que se ejecuta `main.py` es necesario crear la base de datos. Puede tomar algo de tiempo ya que realiza las tareas de web scrapping, agrupamiento, vectorización y almacenamiento. 
-3. 
-4. Con `test.ipynb` se puede realizar una ejecución de prompts predefinidos. Estos prompts prueban la conversacionalidad, fidelidad y filtro de las respuestas del asistente.
+3. Con `test.ipynb` se puede realizar una ejecución de prompts predefinidos. Estos prompts prueban la conversacionalidad, fidelidad y filtro de las respuestas del asistente.
 
 ## 📖 Descripción 
 
