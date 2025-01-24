@@ -25,43 +25,25 @@ def create_db(db_handler: DBHandler):
     logger.info(f"Data stored, {db_handler.collection.count()} segments stored")
 
 def main():
-    mode = "auto" # "auto" for the testing prompts
     db_handler = DBHandler()
     agent = MainAgent(db_handler)
     
     db_control = input("Do you want to create the database? The current database will be deleted (y/n): ")
     if db_control == "y":
-        create_db(db_handler)
-    
+        create_db(db_handler)    
     elif db_control == "n":
         if db_handler.collection.count() == 0:
             logger.error("The database is empty, please create the database.")
             return
+
+    while True:
+        query = input("User: ")
+        response = agent.chat(query)
         
-    # Test prompts
-    prompts = ["Cuanto cuesta tramitar el CURP?",
-               "Y el acta de nacimiento?",
-               "En Puebla"]
-    
-    if mode == "auto":
-        for prompt in prompts:
-            print(f"User: {prompt}", flush=True)
-            response = agent.chat(prompt)
-            
-            print("Assistant:", end=" ", flush=True)
-            for i in response:
-                print(i, end="", flush=True)
-            print("\n", flush=True)
-            
-    else:
-        while True:
-            query = input("User: ")
-            response = agent.chat(query)
-            
-            print("Assistant:", end=" ", flush=True)
-            for i in response:
-                print(i, end="", flush=True)
-            print("\n", flush=True)
+        print("Assistant:", end=" ", flush=True)
+        for i in response:
+            print(i, end="", flush=True)
+        print("\n", flush=True)
     
 if __name__ == "__main__":
     main()
