@@ -53,17 +53,13 @@ class MainAgent():
         # Get the response
         response = llm.stream_chat(messages)
         
-        text_prev = ""
+        token = ""
         full_text = ""
         for i in response:
             sleep(0.015)
-            text = i.message.content
-            if text is not None:
-                text.replace(text_prev, "")
-                text_prev = i.message.content
-                full_text += text
-
-                yield text
-            
+            if i.message.content is not None:
+                token = i.message.content.replace(full_text, "")
+                full_text = i.message.content
+                yield token
         
         self.history.append((query, full_text))
