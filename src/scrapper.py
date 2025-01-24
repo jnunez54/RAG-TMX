@@ -71,7 +71,7 @@ class Scrapper():
         if not self.urls:
             self.get_urls()
         
-        for url in self.urls[:10]:
+        for url in self.urls:
             response = requests.get(url["href"])
             soup = BeautifulSoup(response.text, "html.parser")
             paragraphs = soup.find_all("p")
