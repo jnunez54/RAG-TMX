@@ -20,7 +20,7 @@ class Scrapper():
         logger.info("Getting the urls of the processes")
         with sync_playwright() as p:
             # Open the browser
-            browser = p.chromium.launch(headless=True)
+            browser = p.chromium.launch(headless=False)
             page = browser.new_page()
             
             # Load the page

@@ -1,54 +1,63 @@
 import streamlit as st
 import time
-import base64
-import os
 
-def parse_pdf(pdf_path):
-    start_time = time.time()
-    markdown_content = f"Contenido parseado de {pdf_path}, aqui se supone que va un monton de contenido parseado pero todvia no lo implemento, tecnologia es un termino general que se aplica al proceso por el cual los sers humanos dise;an herramientas para incrementar su control y suc omprension del entorno material que lo rodea"  
-    time.sleep(2)
-    elapsed_time = time.time() - start_time
-    return markdown_content, elapsed_time
+from database import DBHandler
+from agents import MainAgent
 
-if 'pdf_index' not in st.session_state:
-    st.session_state.pdf_index = 0
+st.set_page_config(page_title="RAG-TMX", layout="wide")
 
-st.title("Test PDF Parser")
+# Título de la app
+st.title("🤖 [RAG-TMX]")
+st.subheader("Chatbot para trámites mexicanos")
+st.markdown("Powered by [Transformers] - [ChromaDB] - [Granite2B]")
 
-tipo_proceso = st.radio("Tipo de documento:", ["DOF(Digitalizado)", "Solicitudes de Transparencia"], horizontal=True)
+# --- Inicialización de sesión ---
+if "history" not in st.session_state:
+    # Cada elemento: {"query": str, "response": str, "thought": str}
+    st.session_state.history = []
 
-if tipo_proceso == "DOF(Digitalizado)":
-    path = "DOF"
-    pdf_files = os.listdir("DOF")
-else:
-    path = "Solicitudes"
-    pdf_files = os.listdir("Solicitudes")
-    
-col1, col2 = st.columns(2)
-with col1:
-    if st.button("← Anterior"):
-        st.session_state.pdf_index = max(0, st.session_state.pdf_index - 1)
-with col2:
-    if st.button("Siguiente →"):
-        st.session_state.pdf_index = min(len(pdf_files) - 1, st.session_state.pdf_index + 1)
+# Placeholder donde volcamos toda la conversación
+chat_placeholder = st.empty()
 
-current_pdf = pdf_files[st.session_state.pdf_index]
+def display_conversation():
+    """Renderiza todo el historial de la conversación, incluyendo el proceso de pensamiento."""
+    md = ""
+    for turn in st.session_state.history:
+        md += f"**🧍 Tú:** {turn['query']}\n\n"
+        md += f"**🤖 TMX:** {turn['response']}\n\n"
+        if turn.get("thought"):
+            md += (
+                "<details>\n"
+                "  <summary>🧠 <em>Proceso de pensamiento</em></summary>\n\n"
+                f"  {turn['thought']}\n\n"
+                "</details>\n\n"
+            )
+    chat_placeholder.markdown(md, unsafe_allow_html=True)
 
-col1, col2 = st.columns(2)
-with col1:
-    with open(os.path.join(path, current_pdf), "rb") as pdf_file: 
-        pdf_bytes = pdf_file.read()
-        base64_pdf = base64.b64encode(pdf_bytes).decode("utf-8")
+display_conversation()
 
-        pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="300" height="400" type="application/pdf"></iframe>'        
-        st.markdown(pdf_display, unsafe_allow_html=True)
-with col2:
-    if st.button("Parsear PDF"):
-        parsed_content, parse_time = parse_pdf(current_pdf)
-        st.session_state.parsed_content = parsed_content
-        st.session_state.parse_time = parse_time
-    
-    if 'parsed_content' in st.session_state:
-        st.markdown(f"**Tiempo de parseo:** {st.session_state.parse_time:.2f} segundos")
-        st.markdown("---")
-        st.markdown(st.session_state.parsed_content, unsafe_allow_html=True)
+with st.form("chat_form", clear_on_submit=True):
+    user_input = st.text_input("Escribe tu pregunta:", placeholder="¿En qué puedo ayudarte?")
+    send = st.form_submit_button("Enviar")
+
+if send and user_input:
+    st.session_state.history.append({
+        "query": user_input,
+        "response": "",
+        "thought": ""
+    })
+    display_conversation()  # refresh
+    db_handler = DBHandler()
+    agent = MainAgent(db_handler)
+
+    for token in agent.chat(user_input):
+        st.session_state.history[-1]["response"] += token
+        display_conversation()
+
+    # Al terminar, obtenemos el proceso de pensamiento
+    try:
+        thought_text = agent.get_thinking()
+    except AttributeError:
+        thought_text = ""
+    st.session_state.history[-1]["thought"] = thought_text
+    display_conversation()
